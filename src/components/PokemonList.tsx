@@ -1,25 +1,22 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import Container from '@mui/material/Container';
 import { PokemonCard } from './PokemonCard';
 import { Grid } from '@mui/material';
+import { MySquad } from './MySquad';
 
-// type Pokemon = {
-//   name: string;
-// };
-
-type PokemonDetails = {
+export type PokemonDetails = {
   id: number;
   name: string;
   url: string;
   sprite: string;
-  move:string;
-  flingPower:number;
-  level:number
+  move: string;
+  flingPower: number;
+  level: number;
 };
 
 function PokemonList() {
   const [pokemonList, setPokemonList] = useState<PokemonDetails[]>([]);
+  const [mySquad, setMySquad] = useState<PokemonDetails[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,14 +27,15 @@ function PokemonList() {
         const results = data.results;
 
         const detailedResults = await Promise.all(
-          results.map(async (pokemon: PokemonDetails) => {
+          results.map(async (pokemon: { url: string }) => {
             const pokemonData = await axios.get(pokemon.url);
 
             return {
+              id: pokemonData.data.id,
               name: pokemonData.data.name,
               sprite: pokemonData.data.sprites.front_default,
-              move:pokemonData.data.moves[0].move.name,
-              level: pokemonData.data.base_experience || 'Unknown level'
+              move: pokemonData.data.moves[0]?.move?.name || 'Unknown move',
+              level: pokemonData.data.base_experience || 'Unknown level',
             };
           })
         );
@@ -50,6 +48,25 @@ function PokemonList() {
     fetchData();
   }, []);
 
+  const addToSquad = (pok: PokemonDetails) => {
+    setMySquad((currentSquad) => {
+      if (currentSquad.find((p) => p.id === pok.id)) {
+        return currentSquad;
+      } else {
+        console.log('adding new pok', pok.id);
+        setPokemonList((currentList) =>
+          currentList.filter((p) => p.id !== pok.id)
+        );
+        return [...currentSquad, pok];
+      }
+    });
+  };
+
+  const removeFromSquad = (pok: PokemonDetails) => {
+    setMySquad((currentSquad) => currentSquad.filter((p) => p.id !== pok.id));
+    setPokemonList((currentList) => [...currentList, pok]);
+  };
+
   return (
     <Grid
       container
@@ -60,9 +77,16 @@ function PokemonList() {
       columnSpacing={4}
       justifyContent='space-between'
     >
+      {mySquad.length > 0 && (
+        <MySquad mySquad={mySquad} removeFromSquad={removeFromSquad} />
+      )}
       {pokemonList.map((pokemon) => (
         <div key={pokemon?.id}>
-          <PokemonCard pokemon={pokemon} />
+          <PokemonCard
+            pokemon={pokemon}
+            addToSquad={() => addToSquad(pokemon)}
+            isAdded={false}
+          />
         </div>
       ))}
     </Grid>
