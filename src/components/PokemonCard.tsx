@@ -2,14 +2,13 @@ import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import { Typography } from '@mui/material';
+import { AddRemoveBtn } from './Button';
+import type { PokemonDetails } from './PokemonList';
+
 type Props = {
-  pokemon: {
-    name: string;
-    sprite: string;
-    move: string;
-    flingPower: number;
-    level: number;
-  };
+  pokemon: PokemonDetails;
+  addToSquad: (pokemon: PokemonDetails) => void;
+  isAdded: boolean;
 };
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -27,7 +26,7 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-function PokemonCard({ pokemon }: Props) {
+function PokemonCard({ pokemon, addToSquad, isAdded }: Props) {
   console.log({ pokemon });
   const capitalizedName = (name: string) =>
     name.charAt(0).toUpperCase() + name.slice(1);
@@ -56,9 +55,13 @@ function PokemonCard({ pokemon }: Props) {
             Level {pokemon?.level}
           </Typography>
         </>
+        <AddRemoveBtn
+          isAdded={isAdded}
+          handleClick={() => addToSquad(pokemon)}
+        />
       </Item>
     </Grid>
   );
 }
 
-export { PokemonCard };
+export { PokemonCard, Item };
