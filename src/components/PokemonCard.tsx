@@ -29,14 +29,14 @@ const Item = styled(Paper)(({ theme }) => ({
 function PokemonCard({ pokemon, addToSquad, isAdded }: Props) {
   console.log({ pokemon });
   const capitalizedName = (name: string) =>
-    name.charAt(0).toUpperCase() + name.slice(1);
+    name?.charAt(0).toUpperCase() + name?.slice(1);
   const capitalizedMove = (move: string) =>
-    move.charAt(0).toUpperCase() + move.slice(1);
+    move?.charAt(0).toUpperCase() + move?.slice(1);
   return (
-    <Grid item>
+    <Grid item data-testid='pokemon-card'>
       <Item>
         <>
-          <img src={pokemon.sprite} alt={pokemon.name} />
+          <img src={pokemon?.sprite} alt={pokemon?.name} />
           <Typography
             variant='h6'
             component='h2'
